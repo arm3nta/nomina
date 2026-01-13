@@ -4,11 +4,11 @@ import pdfplumber
 import re
 import io
 
-# Configuración de la página
-st.set_page_config(page_title="Analizador de Nómina", layout="centered")
+# Configuración visual de la página
+st.set_page_config(page_title="Analizador de Nómina Pro", layout="wide")
 
-st.title("📊 Analizador de Recibos de Nómina")
-st.markdown("Sube tus archivos PDF para obtener un resumen detallado.")
+st.title("📊 Analizador de Nómina (Anti-Duplicados)")
+st.markdown("Sube tus PDFs. El sistema detectará automáticamente si hay recibos repetidos y los excluirá.")
 
 def limpiar_numero(texto):
     if not texto: return 0.0
@@ -18,80 +18,97 @@ def limpiar_numero(texto):
     except:
         return 0.0
 
-# --- LÓGICA DE PROCESAMIENTO ---
-uploaded_files = st.file_uploader("Elige tus recibos de nómina (PDF)", type="pdf", accept_multiple_files=True)
+# --- CARGA DE ARCHIVOS ---
+uploaded_files = st.file_uploader("Arrastra aquí tus recibos de nómina", type="pdf", accept_multiple_files=True)
 
 if uploaded_files:
     datos_recibos = []
-    folios_vistos = set()
-    alertas = []
+    folios_vistos = {} # Usamos un diccionario para saber en qué archivo apareció primero
+    duplicados_encontrados = []
 
     for uploaded_file in uploaded_files:
-        with pdfplumber.open(io.BytesIO(uploaded_file.read())) as pdf:
+        # Volvemos a leer el archivo desde el principio
+        bytes_data = uploaded_file.getvalue()
+        with pdfplumber.open(io.BytesIO(bytes_data)) as pdf:
             texto_completo = ""
             for page in pdf.pages:
                 texto_completo += page.extract_text() or ""
             
-            # Busqueda de Folio
+            # 1. BUSCAR FOLIO (Ajustado a tu formato SEP)
             folio_match = re.search(r'No\.\s*DE\s*COMPROBANTE\s*[\n\r]*\s*(\d+)', texto_completo, re.IGNORECASE)
             folio = folio_match.group(1) if folio_match else "Desconocido"
 
-            # Busqueda de Percepciones
+            # --- VALIDACIÓN DE DUPLICADOS ---
+            if folio != "Desconocido":
+                if folio in folios_vistos:
+                    # Si ya existe, lo guardamos para avisar pero NO lo procesamos
+                    duplicados_encontrados.append({
+                        "folio": folio,
+                        "archivo_actual": uploaded_file.name,
+                        "archivo_original": folios_vistos[folio]
+                    })
+                    continue # <--- AQUÍ ESTÁ EL TRUCO: Salta este archivo y sigue con el siguiente
+                else:
+                    folios_vistos[folio] = uploaded_file.name
+
+            # 2. BUSCAR PERCEPCIONES (Basado en tu comprobante 27601432)
             perc_match = re.search(r'PERCEPCIONES.*?\n.*?\$?\s*([\d,]+\.\d{2})', texto_completo)
             percepciones = limpiar_numero(perc_match.group(1)) if perc_match else 0.0
 
-            # Busqueda de ISR
+            # 3. BUSCAR ISR (Código 01)
             isr_match = re.search(r'IMPUESTO SOBRE LA RENTA.*?([\d,]+\.\d{2})', texto_completo, re.IGNORECASE)
             isr = limpiar_numero(isr_match.group(1)) if isr_match else 0.0
 
-            # Detectar Aguinaldo
+            # 4. DETECTAR AGUINALDO
             es_aguinaldo = "aguinaldo" in texto_completo.lower() or "gratificacion anual" in texto_completo.lower()
-
-            if folio != "Desconocido":
-                if folio in folios_vistos:
-                    alertas.append(f"⚠️ El folio **{folio}** está repetido y no se sumó.")
-                    continue
-                folios_vistos.add(folio)
 
             datos_recibos.append({
                 "Archivo": uploaded_file.name,
                 "Folio": folio,
                 "Percepciones": percepciones,
                 "ISR": isr,
-                "Es_Aguinaldo": es_aguinaldo
+                "Tipo": "Aguinaldo" if es_aguinaldo else "Ordinaria"
             })
+
+    # --- MOSTRAR ALERTAS DE DUPLICADOS ---
+    if duplicados_encontrados:
+        st.error("🚫 SE DETECTARON ARCHIVOS REPETIDOS")
+        for d in duplicados_encontrados:
+            st.warning(f"El folio **{d['folio']}** del archivo `{d['archivo_actual']}` ya existe en `{d['archivo_original']}`. **Fue ignorado para los cálculos.**")
 
     if datos_recibos:
         df = pd.DataFrame(datos_recibos)
         
-        # Cálculos
-        sin_aguinaldo = df[df['Es_Aguinaldo'] == False]
-        con_aguinaldo = df[df['Es_Aguinaldo'] == True]
-
-        # Interfaz de la Web-App
-        if alertas:
-            for a in alertas: st.warning(a)
-
-        col1, col2 = st.columns(2)
+        # --- CÁLCULOS ---
+        # 1. Sin aguinaldo
+        df_regular = df[df['Tipo'] == "Ordinaria"]
+        # 2. Con aguinaldo
+        df_aguinaldo = df[df['Tipo'] == "Aguinaldo"]
         
-        with col1:
-            st.subheader("🏠 Nómina Regular")
-            st.metric("Total Percepciones", f"${sin_aguinaldo['Percepciones'].sum():,.2f}")
-            st.metric("Total ISR", f"${sin_aguinaldo['ISR'].sum():,.2f}")
+        # --- INTERFAZ DE RESULTADOS ---
+        st.divider()
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            st.info("🏠 **Nómina Regular**")
+            st.metric("Percepciones", f"${df_regular['Percepciones'].sum():,.2f}")
+            st.metric("ISR", f"${df_regular['ISR'].sum():,.2f}")
 
-        with col2:
-            st.subheader("🎁 Aguinaldos")
-            st.metric("Total Percepciones", f"${con_aguinaldo['Percepciones'].sum():,.2f}")
-            st.metric("Total ISR", f"${con_aguinaldo['ISR'].sum():,.2f}")
+        with c2:
+            st.info("🎁 **Solo Aguinaldos**")
+            st.metric("Percepciones", f"${df_aguinaldo['Percepciones'].sum():,.2f}")
+            st.metric("ISR", f"${df_aguinaldo['ISR'].sum():,.2f}")
+
+        with c3:
+            st.success("🌎 **Totales Globales**")
+            t_perc = df['Percepciones'].sum()
+            t_isr = df['ISR'].sum()
+            st.metric("Total Percepciones", f"${t_perc:,.2f}")
+            st.metric("Total ISR", f"${t_isr:,.2f}")
 
         st.divider()
-        st.subheader("🌎 Resumen Global")
-        t_perc = df['Percepciones'].sum()
-        t_isr = df['ISR'].sum()
+        st.subheader(f"💰 Resultado Final (Resta): ${t_perc - t_isr:,.2f}")
         
-        st.write(f"**Gran Total Percepciones:** ${t_perc:,.2f}")
-        st.write(f"**Gran Total ISR:** ${t_isr:,.2f}")
-        st.success(f"### 💰 Resta Final: ${t_perc - t_isr:,.2f}")
-        
-        # Botón para descargar a Excel
-        st.download_button("Descargar tabla en Excel", df.to_csv(index=False), "nomina.csv", "text/csv")
+        # Tabla detallada
+        with st.expander("Ver detalle de archivos procesados"):
+            st.table(df)
