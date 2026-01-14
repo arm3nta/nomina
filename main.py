@@ -30,10 +30,10 @@ def set_background(png_file):
         page_bg_img = f'''
         <style>
         .stMarkdown {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-}
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
         .stApp {{
             background-image: url("data:image/png;base64,{bin_str}");
             background-size: cover;
