@@ -43,14 +43,9 @@ def set_background(png_file):
 # 3. ACTIVAR EL FONDO (Asegúrate de que el nombre sea exacto al de GitHub)
 set_background('SCEO_VER.png')
 
-st.title("📊 Control de Recibos de Nómina")
+st.title("📊 Calculadora de Nómina Anual")
 
-# ... (El resto de tu código de funciones y procesado de PDF sigue igual)
-
-
-
-
-
+# ... (Acá inicia el código de funciones y procesado de PDF)
 def limpiar_numero(texto):
     if not texto: return 0.0
     try:
