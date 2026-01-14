@@ -8,14 +8,14 @@ from PIL import Image  # <--- Nueva herramienta para leer tu imagen
 # 1. CARGAR TU IMAGEN PERSONALIZADA
 # Intentamos abrir la imagen que subiste a GitHub
 try:
-    img_favicon = Image.open("DGCFT png.png")
+    img_favicon = Image.open("DGCFC.png")
 except:
     img_favicon = "💵" # Si no encuentra la imagen, pone este emoji por defecto
 
 # 2. CONFIGURACIÓN DEL ICONO (FAVICON) Y TÍTULO
 st.set_page_config(
     page_title="Control de Nómina", 
-    page_icon=DGCFT png.png, # <--- Aquí ya usa tu imagen
+    page_icon=DGCFT.png, # <--- Aquí ya usa tu imagen
     layout="wide"
 )
 def limpiar_numero(texto):
