@@ -8,7 +8,7 @@ from PIL import Image  # <--- Nueva herramienta para leer tu imagen
 # 1. CARGAR TU IMAGEN PERSONALIZADA
 # Intentamos abrir la imagen que subiste a GitHub
 try:
-    img_favicon = Image.open("DGCFC.png")
+    img_favicon = Image.open("DGCFT.png")
 except:
     img_favicon = "💵" # Si no encuentra la imagen, pone este emoji por defecto
 
