@@ -31,9 +31,11 @@ def set_background(png_file):
         <style>
         /* IMPORTANTE: Usamos doble llave {{ }} para que Python no marque error */
         .stMarkdown {{
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
+            /* 0.92 es menos transparente que 0.8. Se verá un blanco más firme */
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1); /* Agregué una sombra suave */
         }}
         .stApp {{
             background-image: url("data:image/png;base64,{bin_str}");
