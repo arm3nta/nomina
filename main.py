@@ -6,7 +6,7 @@ import io
 
 st.set_page_config(page_title="Analizador Pro", layout="wide")
 
-st.title("📊 Analizador de Nómina (Versión Final)")
+st.title("📊 Calculadora de Nómina Anual")
 
 def limpiar_numero(texto):
     if not texto: return 0.0
