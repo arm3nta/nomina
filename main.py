@@ -4,7 +4,7 @@ import pdfplumber
 import re
 import io
 
-st.set_page_config(https://www.google.com/imgres?q=dgcft&imgurl=https%3A%2F%2Fcecati78.edu.mx%2Fimages%2Flogocecati.png&imgrefurl=https%3A%2F%2Fcecati78.edu.mx%2F&docid=IkUB7RvXZ5Fe7M&tbnid=QZGHzYw2OqhxwM&vet=12ahUKEwi915LTw4uSAxWBkmoFHed8HbwQM3oECBYQAA..i&w=791&h=1033&hcb=2&ved=2ahUKEwi915LTw4uSAxWBkmoFHed8HbwQM3oECBYQAA, layout="wide")
+st.set_page_config(https://share.google/images/TxABJnXd84JZufoS6, layout="wide")
 
 st.title("📊 Calculadora de Nómina Anual")
 
