@@ -18,6 +18,30 @@ st.set_page_config(
     page_icon=img_favicon, # <--- Aquí ya usa tu imagen
     layout="wide"
 )
+
+import base64
+
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_background(png_file):
+    bin_str = get_base64(png_file)
+    page_bg_img = f'''
+    <style>
+    .stApp {{
+        background-image: SCEO_VER.png);
+        background-size: cover;
+    }}
+    </style>
+    '''
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# Llama a la función con el nombre de tu imagen de fondo subida a GitHub
+# set_background('fondo.png')
+
+
 def limpiar_numero(texto):
     if not texto: return 0.0
     try:
