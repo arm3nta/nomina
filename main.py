@@ -14,13 +14,10 @@ except:
 
 # 2. CONFIGURACIÓN DEL ICONO (FAVICON) Y TÍTULO
 st.set_page_config(
-    page_title="Calculadora de Nomina Anual", 
-    page_icon=DGCFT png, # <--- Aquí ya usa tu imagen
+    page_title="Control de Nómina", 
+    page_icon=DGCFT png.png, # <--- Aquí ya usa tu imagen
     layout="wide"
 )
-
-# ... El resto de tu código de fondo y título sigue igual ...
-
 def limpiar_numero(texto):
     if not texto: return 0.0
     try:
