@@ -15,7 +15,7 @@ except:
 # 2. CONFIGURACIÓN DEL ICONO (FAVICON) Y TÍTULO
 st.set_page_config(
     page_title="Control de Nómina", 
-    page_icon=DGCFT.png, # <--- Aquí ya usa tu imagen
+    page_icon=img_favicon, # <--- Aquí ya usa tu imagen
     layout="wide"
 )
 def limpiar_numero(texto):
