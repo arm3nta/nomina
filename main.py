@@ -29,11 +29,12 @@ def set_background(png_file):
         bin_str = get_base64(png_file)
         page_bg_img = f'''
         <style>
-        .stMarkdown {
+        /* IMPORTANTE: Usamos doble llave {{ }} para que Python no marque error */
+        .stMarkdown {{
             background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 5px;
-        }
+        }}
         .stApp {{
             background-image: url("data:image/png;base64,{bin_str}");
             background-size: cover;
@@ -42,8 +43,9 @@ def set_background(png_file):
         </style>
         '''
         st.markdown(page_bg_img, unsafe_allow_html=True)
-    except:
-        st.sidebar.error("No se pudo cargar la imagen de fondo. Revisa el nombre en GitHub.")
+    except Exception as e:
+        # Esto te dirá el error exacto en la barra lateral si algo falla
+        st.sidebar.error(f"Error: {e}")
 
 # 3. ACTIVAR EL FONDO (Asegúrate de que el nombre sea exacto al de GitHub)
 set_background('SCEO_VER.png')
