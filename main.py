@@ -3,43 +3,52 @@ import pandas as pd
 import pdfplumber
 import re
 import io
-from PIL import Image  # <--- Nueva herramienta para leer tu imagen
+import base64
+from PIL import Image
 
-# 1. CARGAR TU IMAGEN PERSONALIZADA
-# Intentamos abrir la imagen que subiste a GitHub
+# 1. CONFIGURACIÓN DE PESTAÑA
 try:
     img_favicon = Image.open("DGCFT.png")
 except:
-    img_favicon = "💵" # Si no encuentra la imagen, pone este emoji por defecto
+    img_favicon = "💵"
 
-# 2. CONFIGURACIÓN DEL ICONO (FAVICON) Y TÍTULO
 st.set_page_config(
     page_title="Control de Nómina", 
-    page_icon=img_favicon, # <--- Aquí ya usa tu imagen
+    page_icon=img_favicon, 
     layout="wide"
 )
 
-import base64
-
+# 2. FUNCIÓN PARA EL FONDO
 def get_base64(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
 def set_background(png_file):
-    bin_str = get_base64(png_file)
-    page_bg_img = f'''
-    <style>
-    .stApp {{
-        background-image: SCEO_VER.png);
-        background-size: cover;
-    }}
-    </style>
-    '''
-    st.markdown(page_bg_img, unsafe_allow_html=True)
+    try:
+        bin_str = get_base64(png_file)
+        page_bg_img = f'''
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{bin_str}");
+            background-size: cover;
+            background-attachment: fixed;
+        }}
+        </style>
+        '''
+        st.markdown(page_bg_img, unsafe_allow_html=True)
+    except:
+        st.sidebar.error("No se pudo cargar la imagen de fondo. Revisa el nombre en GitHub.")
 
-# Llama a la función con el nombre de tu imagen de fondo subida a GitHub
-# set_background('fondo.png')
+# 3. ACTIVAR EL FONDO (Asegúrate de que el nombre sea exacto al de GitHub)
+set_background('SCEO_VER.png')
+
+st.title("📊 Control de Recibos de Nómina")
+
+# ... (El resto de tu código de funciones y procesado de PDF sigue igual)
+
+
+
 
 
 def limpiar_numero(texto):
