@@ -3,10 +3,23 @@ import pandas as pd
 import pdfplumber
 import re
 import io
+from PIL import Image  # <--- Nueva herramienta para leer tu imagen
 
-st.set_page_config(https://share.google/images/TxABJnXd84JZufoS6, layout="wide")
+# 1. CARGAR TU IMAGEN PERSONALIZADA
+# Intentamos abrir la imagen que subiste a GitHub
+try:
+    img_favicon = Image.open("DGCFT png.png")
+except:
+    img_favicon = "💵" # Si no encuentra la imagen, pone este emoji por defecto
 
-st.title("📊 Calculadora de Nómina Anual")
+# 2. CONFIGURACIÓN DEL ICONO (FAVICON) Y TÍTULO
+st.set_page_config(
+    page_title="Calculadora de Nomina Anual", 
+    page_icon=DGCFT png, # <--- Aquí ya usa tu imagen
+    layout="wide"
+)
+
+# ... El resto de tu código de fondo y título sigue igual ...
 
 def limpiar_numero(texto):
     if not texto: return 0.0
